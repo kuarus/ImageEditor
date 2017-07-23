@@ -1,2 +1,4 @@
 *.db
 Project2015/Debug/
+Project2015/Log.txt
+*.opendb
