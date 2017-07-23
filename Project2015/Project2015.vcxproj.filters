@@ -2,9 +2,16 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="WinMain.cpp" />
+    <ClCompile Include="Editor.cpp" />
+    <ClCompile Include="Window.cpp" />
+    <ClCompile Include="Interface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Editor.h" />
+    <ClInclude Include="Window.h" />
+    <ClInclude Include="Interface.h" />
+    <ClInclude Include="define.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Menu.rc" />

@@ -158,10 +158,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Editor.cpp" />
+    <ClCompile Include="Interface.cpp" />
+    <ClCompile Include="Window.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="define.h" />
+    <ClInclude Include="Editor.h" />
+    <ClInclude Include="Interface.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Menu.rc" />
