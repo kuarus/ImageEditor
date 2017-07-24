@@ -158,17 +158,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Desk.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="Interface.cpp" />
+    <ClCompile Include="Layer.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WinMain.cpp" />
+    <ClCompile Include="Work.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="define.h" />
+    <ClInclude Include="Desk.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="Interface.h" />
+    <ClInclude Include="Layer.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Window.h" />
+    <ClInclude Include="Work.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Menu.rc" />

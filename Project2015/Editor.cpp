@@ -4,7 +4,7 @@
 #include "define.h"
 #include "Window.h"
 #include "Interface.h"
-//#include <afxdlgs.h>
+#include "Desk.h"
 
 std::shared_ptr< Editor > Editor::_instance;
 
@@ -90,7 +90,11 @@ void Editor::excuteCommand( HWND hWnd, WPARAM wParam ) {
 		_ofn.Flags = TRUE;
 		_ofn.lpstrDefExt = "png";
 		_ofn.lpstrTitle = "ファイルを開く";
-		GetOpenFileName( &_ofn );
+		if ( GetOpenFileName( &_ofn ) == TRUE ) {
+			if ( !_desk->load( _ofn.lpstrFile ) ) {
+				MessageBox( NULL, "ファイルの読み込みに失敗しました", "エラー", MB_OK );
+			}
+		}
 	}
 		break;
 	case IDM_FILESAVE:
@@ -103,7 +107,11 @@ void Editor::excuteCommand( HWND hWnd, WPARAM wParam ) {
 		_ofn.Flags = TRUE;    
 		_ofn.lpstrDefExt = "png";
 		_ofn.lpstrTitle = "名前を付けて保存";
-		GetSaveFileName( &_ofn );
+		if ( GetSaveFileName( &_ofn ) == TRUE ) {
+			if ( !_desk->save( _ofn.lpstrFile ) ) {
+				MessageBox( NULL, "ファイルの読み込みに失敗しました", "エラー", MB_OK );
+			}
+		}
 	}
 		break;
 	case IDM_MAKEFOLDER:

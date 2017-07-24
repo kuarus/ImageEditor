@@ -1,4 +1,3 @@
-#include <afxdlgs.h>
 #include "Window.h"
 #include "resource.h"
 #include "Editor.h"

@@ -2,18 +2,61 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="WinMain.cpp" />
+    <ClCompile Include="Desk.cpp">
+      <Filter>Edit</Filter>
+    </ClCompile>
+    <ClCompile Include="Layer.cpp">
+      <Filter>Edit</Filter>
+    </ClCompile>
+    <ClCompile Include="Work.cpp">
+      <Filter>Edit</Filter>
+    </ClCompile>
     <ClCompile Include="Editor.cpp" />
-    <ClCompile Include="Window.cpp" />
-    <ClCompile Include="Interface.cpp" />
+    <ClCompile Include="Window.cpp">
+      <Filter>Other</Filter>
+    </ClCompile>
+    <ClCompile Include="Interface.cpp">
+      <Filter>Other</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="resource.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="Desk.h">
+      <Filter>Edit</Filter>
+    </ClInclude>
+    <ClInclude Include="Layer.h">
+      <Filter>Edit</Filter>
+    </ClInclude>
+    <ClInclude Include="Work.h">
+      <Filter>Edit</Filter>
+    </ClInclude>
     <ClInclude Include="Editor.h" />
-    <ClInclude Include="Window.h" />
-    <ClInclude Include="Interface.h" />
-    <ClInclude Include="define.h" />
+    <ClInclude Include="Interface.h">
+      <Filter>Other</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.h">
+      <Filter>Other</Filter>
+    </ClInclude>
+    <ClInclude Include="define.h">
+      <Filter>Other</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Menu.rc" />
+    <Filter Include="Menu">
+      <UniqueIdentifier>{57eb4676-415d-463b-a6ee-e9f453ceb510}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Edit">
+      <UniqueIdentifier>{4bcc8ae6-0234-4ff5-9266-23ba9f275591}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Other">
+      <UniqueIdentifier>{054ef56f-06e6-4967-8b89-fe1c0a039b3b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Menu.rc">
+      <Filter>Menu</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
