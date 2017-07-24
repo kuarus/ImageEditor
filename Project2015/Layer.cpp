@@ -3,11 +3,19 @@
 
 
 Layer::Layer( ) :
-_handle( -1 ) {
+_handle( -1 ),
+_eye( true ) {
 }
 
 
 Layer::~Layer( ) {
+}
+
+void Layer::draw( ) const {
+	if ( !_eye ) {
+		return;
+	}
+	DrawGraph( 0, 0, _handle, TRUE );
 }
 
 bool Layer::load( const char* filename ) {

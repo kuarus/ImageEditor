@@ -15,6 +15,7 @@ Editor::Editor( int nCmdShow ) {
 		_ofn.lStructSize = sizeof(OPENFILENAME); 
 		_ofn.lpstrFilter = "PNG files (*.png)\0*.png\0JPEG Files (*.jpg;*.jpeg)\0*.jpg; *.jpeg\0";
 	}
+	_desk = std::shared_ptr< Desk >( new Desk );
 	_window = std::shared_ptr< Window >( new Window );
 	if ( _window->create( ) == FALSE ) {
 		MessageBox( NULL, "ウィンドウの作成に失敗しました", "エラー", MB_OK );
@@ -49,6 +50,7 @@ std::shared_ptr< Editor > Editor::getInstance( ) {
 void Editor::run( ) {
 	while ( isLoop( ) ) {
 		_interface->update( );
+		_desk->draw( );
 		_interface->draw( );
 		flip( );
 	}

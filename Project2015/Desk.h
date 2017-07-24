@@ -9,6 +9,7 @@ public:
 	Desk( );
 	virtual ~Desk( );
 public:
+	void draw( ) const;
 	bool load( const char* filename );
 	bool save( const char* filename ) const;
 private:
