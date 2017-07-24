@@ -6,5 +6,10 @@ public:
 public:
 	void update( );
 	void draw( ) const;
+private:
+	void drawBG( ) const;
+	void drawLayerBox( ) const;
+private:
+	int _handle;
 };
 

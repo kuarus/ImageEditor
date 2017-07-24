@@ -17,7 +17,7 @@ void Desk::draw( ) const {
 	}
 }
 
-bool Desk::load( const char* filename ) {
+bool Desk::load( std::string filename ) {
 	//”z—ñ‚ª¬‚³‚©‚Á‚½ê‡‚Í”z—ñ‚ğŠg’£
 	if ( ( int )_work.size( ) == _active_work ) {
 		_work.push_back( std::shared_ptr< Work >( new Work ) );
@@ -35,7 +35,7 @@ bool Desk::load( const char* filename ) {
 	return true;
 }
 
-bool Desk::save( const char* filename ) const {
+bool Desk::save( std::string filename ) const {
 	if ( !_work[ _active_work ]->save( filename ) ) {
 		return false;
 	}

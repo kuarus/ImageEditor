@@ -9,11 +9,13 @@ public:
 	Work( );
 	virtual ~Work( );
 public:
-	bool load( const char* filename );
-	bool save( const char* filename ) const;
+	bool create( );
+	bool load( std::string filename );
+	bool save( std::string filename ) const;
 	void draw( ) const;
 private:
 	int _active_layer;
+	int _handle;
 	std::vector< std::shared_ptr< Layer > > _layer;
 };
 

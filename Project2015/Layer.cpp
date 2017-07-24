@@ -18,13 +18,24 @@ void Layer::draw( ) const {
 	DrawGraph( 0, 0, _handle, TRUE );
 }
 
-bool Layer::load( const char* filename ) {
+bool Layer::load( std::string filename ) {
 	if ( _handle < 0 ) {
 		DeleteGraph( _handle );
 	}
-	_handle = LoadGraph( filename );
+	_handle = LoadGraph( filename.c_str( ) );
 	if ( _handle < 0 ) {
 		return false;
 	}
 	return true;
+}
+
+int Layer::getHandle( ) const {
+	return _handle;
+}
+
+void Layer::create( int width, int height ) {
+	if ( _handle >= 0 ) {
+		DeleteGraph( _handle );
+	}
+	_handle = MakeScreen( width, height, TRUE );
 }
