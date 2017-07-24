@@ -161,7 +161,10 @@
     <ClCompile Include="Desk.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="Interface.cpp" />
+    <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="Layer.cpp" />
+    <ClCompile Include="Mouse.cpp" />
+    <ClCompile Include="Task.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WinMain.cpp" />
     <ClCompile Include="Work.cpp" />
@@ -171,8 +174,11 @@
     <ClInclude Include="Desk.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="Interface.h" />
+    <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Layer.h" />
+    <ClInclude Include="Mouse.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Task.h" />
     <ClInclude Include="Window.h" />
     <ClInclude Include="Work.h" />
   </ItemGroup>

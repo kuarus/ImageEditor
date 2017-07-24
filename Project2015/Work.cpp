@@ -2,12 +2,17 @@
 #include "Layer.h"
 #include "DxLib.h"
 
-Work::Work( ) {
-	_handle = -1;
+Work::Work( ) :
+_handle( -1 ),
+_zoom( 1.0 ) {
 }
 
 
 Work::~Work( ) {
+}
+
+void Work::update( ) {
+
 }
 
 void Work::draw( ) const {
@@ -21,7 +26,10 @@ void Work::draw( ) const {
 		_layer[ i ]->draw( );
 	}
 	SetDrawScreen( DX_SCREEN_BACK );
-	DrawGraph( 0, 0, _handle, true );
+	int width = 0;
+	int height = 0;
+	GetGraphSize( _handle, &width, &height );
+	DrawExtendGraph( 0, 0, ( int )( width * _zoom ), ( int )( height * _zoom ), _handle, TRUE );
 }
 
 bool Work::create( ) {

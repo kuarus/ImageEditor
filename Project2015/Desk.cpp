@@ -10,10 +10,17 @@ _active_work( 0 ) {
 Desk::~Desk( ) {
 }
 
+void Desk::update( ) {
+	int size = ( int )_work.size( );
+	if ( _active_work <= size + 1 ) {
+		_work[ _active_work ]->update( );
+	}
+}
+
 void Desk::draw( ) const {
 	int size = ( int )_work.size( );
-	for ( int i = 0; i < size; i++ ) {
-		_work[ i ]->draw( );
+	if ( _active_work <= size + 1 ) {
+		_work[ _active_work ]->draw( );
 	}
 }
 

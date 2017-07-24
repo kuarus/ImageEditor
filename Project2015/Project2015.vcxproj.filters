@@ -18,6 +18,15 @@
     <ClCompile Include="Interface.cpp">
       <Filter>Other</Filter>
     </ClCompile>
+    <ClCompile Include="Task.cpp">
+      <Filter>Task</Filter>
+    </ClCompile>
+    <ClCompile Include="Mouse.cpp">
+      <Filter>Task</Filter>
+    </ClCompile>
+    <ClCompile Include="Keyboard.cpp">
+      <Filter>Task</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -42,6 +51,15 @@
     <ClInclude Include="define.h">
       <Filter>Other</Filter>
     </ClInclude>
+    <ClInclude Include="Task.h">
+      <Filter>Task</Filter>
+    </ClInclude>
+    <ClInclude Include="Mouse.h">
+      <Filter>Task</Filter>
+    </ClInclude>
+    <ClInclude Include="Keyboard.h">
+      <Filter>Task</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Menu">
@@ -52,6 +70,9 @@
     </Filter>
     <Filter Include="Other">
       <UniqueIdentifier>{054ef56f-06e6-4967-8b89-fe1c0a039b3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Task">
+      <UniqueIdentifier>{aaa769d9-69d5-40ca-af6a-e4241cbb1af7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

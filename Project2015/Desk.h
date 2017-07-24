@@ -9,6 +9,7 @@ public:
 	Desk( );
 	virtual ~Desk( );
 public:
+	void update( );
 	void draw( ) const;
 	bool load( std::string filename );
 	bool save( std::string filename ) const;

@@ -5,6 +5,8 @@
 #include "Window.h"
 #include "Interface.h"
 #include "Desk.h"
+#include "Mouse.h"
+#include "Keyboard.h"
 
 std::shared_ptr< Editor > Editor::_instance;
 const int WINDOW_MIN_WIDTH = 1280;
@@ -21,7 +23,8 @@ Editor::Editor( int nCmdShow ) {
 	//クラス初期化
 	_desk = std::shared_ptr< Desk >( new Desk );
 	_window = std::shared_ptr< Window >( new Window );
-
+	_task[ TASK_MOUSE ] = std::shared_ptr< Task >( new Mouse );
+	_task[ TASK_KEYBOARD ] = std::shared_ptr< Task >( new Keyboard );
 
 	//ファイル入出力用系統初期化
 	{
@@ -92,9 +95,18 @@ std::shared_ptr< Editor > Editor::getInstance( ) {
 	return _instance;
 }
 
+std::shared_ptr< Task > Editor::getTask( TASK task ) const {
+	return _task[ task ];
+}
+
+
 void Editor::run( ) {
 	while ( isLoop( ) ) {
+		//update
+		updateTask( );
+		_desk->update( );
 		_interface->update( );
+		//draw
 		_desk->draw( );
 		_interface->draw( );
 		flip( );
@@ -105,6 +117,7 @@ int Editor::isLoop( ) {
 	if ( CheckHitKey( KEY_INPUT_ESCAPE ) != 0 ) {
 		return FALSE;
 	}
+	//メッセージ処理
 	MSG msg = MSG( );
 	if ( GetMessage( &msg, NULL, 0, 0 ) <= 0 ) {
 		return FALSE;
@@ -181,5 +194,12 @@ void Editor::excuteCommand( HWND hWnd, WPARAM wParam ) {
 		//終了処理
 		PostQuitMessage( 0 );
 		break;
+	}
+}
+
+
+void Editor::updateTask( ) {
+	for ( int i = 0; i < MAX_TASK; i++ ) {
+		_task[ i ]->update( );
 	}
 }
