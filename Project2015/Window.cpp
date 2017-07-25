@@ -1,84 +1,174 @@
 #include "Window.h"
-#include "resource.h"
-#include "Editor.h"
 #include "DxLib.h"
 #include "define.h"
+#include "resource.h"
+#include "Editor.h"
+#include "Desk.h"
 
 const char* CLASS_NAME = "IE";
 const char* TITLE_NAME = "ImageEditor";
+const std::string EXTENSION_STR[ ] {
+	".png",
+	".jpeg",
+	".jpg"
+	""
+};
+const int WINDOW_MIN_WIDTH = 640;
+const int WINDOW_MIN_HEIGHT = 480;
+
+std::shared_ptr< Window > Window::getTask( ) {
+	return std::dynamic_pointer_cast< Window >( Editor::getInstance( )->getTask( Editor::TASK_WINDOW ) );
+}
+
 
 Window::Window( ) {
+	ChangeWindowMode( TRUE );
+
+	//ウィンドウスタイルのセット
+	SetWindowStyleMode( 7 );
+
+	//メニューを使う
+	SetUseMenuFlag( TRUE );
+
+	//メニューバーのセット
+	SetWindowMenu( IDR_MENU1, MenuProc );
+
+	//最大描画域をディスプレイサイズに設定
+	SetGraphMode( GetSystemMetrics( SM_CXSCREEN ), GetSystemMetrics( SM_CYSCREEN ), 32 );
+
+	//ウィンドウの最小サイズを指定
+	SetWindowMinSize( WINDOW_MIN_WIDTH, WINDOW_MIN_HEIGHT );
+
+	//ウィンドウサイズに合わせて拡大縮小をしないようにする
+	SetWindowSizeChangeEnableFlag( TRUE, FALSE );
+
+	//ドラッグ&ドロップを許可する
+	SetDragFileValidFlag( TRUE );
+
+	//DxLib初期化(ここでwinodwが表示される)
+	if ( DxLib_Init( ) == -1 ) {
+		return;
+	}
+
+	//ウィンドウの表示調整
+	MoveWindow(
+		GetMainWindowHandle( ),
+		( GetSystemMetrics( SM_CXSCREEN ) - WINDOW_MIN_WIDTH  ) / 2,
+		( GetSystemMetrics( SM_CYSCREEN ) - WINDOW_MIN_HEIGHT ) / 2,
+		WINDOW_MIN_WIDTH, WINDOW_MIN_HEIGHT,
+		TRUE
+	);
 }
 
 
 Window::~Window( ) {
 }
 
-int Window::create( ) {
-	WNDCLASSEX wc = { };
-	//サイズ
-	wc.cbSize			= sizeof( WNDCLASSEX );
-	//ウィンドウスタイル
-	wc.style			= CS_HREDRAW | CS_VREDRAW;
-	//ウィンドウのメッセージ処理をする関数
-	wc.lpfnWndProc		= WndProc;
-	//補足バイト数
-	wc.cbClsExtra		= 0L;
-	wc.cbWndExtra		= 0L;
-	//インスタンスハンドル
-	wc.hInstance		= NULL;
-	//アイコンのハンドル
-	wc.hIcon			= NULL;
-	//カーソルのハンドル
-	wc.hCursor			= LoadCursor( NULL, IDC_ARROW );
-	//背景カラーを指定
-	wc.hbrBackground	= (HBRUSH)GetStockObject( WHITE_BRUSH );
-	//メニューバーの名前
-	wc.lpszMenuName		= MAKEINTRESOURCE( IDR_MENU1 );
-	//ウィンドウクラス(this)の名前
-	wc.lpszClassName	= CLASS_NAME;
-	//16x16のアイコン
-	wc.hIconSm			= NULL;
+int Window::MenuProc( WORD word ) {
+	switch ( word ) {
+	case IDM_FILEOPEN:
+	{
+		OPENFILENAME ofn = { };
+		//メモリ掃除
+		memset( &ofn, 0, sizeof( OPENFILENAME ) );
+		//サイズを指定
+		ofn.lStructSize = sizeof( OPENFILENAME ); 
+		//入出力拡張子を指定
+		ofn.lpstrFilter = "PNG Files (*.png)\0*.png\0JPEG Files (*.jpeg)\0*.jpeg\0JPG Files (*.jpg)\0*.jpg\0すべてのファイル (*.*)\0*.*\0";
+		//ディレクトリを指定、NULLでフルパス
+		ofn.lpstrFileTitle = NULL;
+		//初期表示のファイルタイプ( 1:png 2:jpeg 3:all )
+		ofn.nFilterIndex = 1;
+		//ファイル名格納用変数
+		char filename[ MAX_PATH ];
+		ZeroMemory( filename, MAX_PATH );
+		//ダイアログを所持するウィンドウハンドル
+		ofn.hwndOwner = GetMainWindowHandle( );
+		//ファイル名が格納される
+		ofn.lpstrFile = ( char* )filename; 
+		//ファイル名のバッファーサイズ
+		ofn.nMaxFile = MAX_PATH;
+		//拡張機能のフラグ
+		ofn.Flags = OFN_CREATEPROMPT | OFN_ENABLESIZING | OFN_NONETWORKBUTTON;
+		//タイトルバーに表示される名前
+		ofn.lpstrTitle = "ファイルを開く";
 
-	//ウィンドウクラスの登録
-	if ( RegisterClassEx( &wc ) == 0 ) {
-		return FALSE;
+		if ( GetOpenFileName( &ofn ) == TRUE ) {
+			//拡張子確認
+			std::string filename = ofn.lpstrFile;
+			EXTENSION extention = ( EXTENSION )( ofn.nFilterIndex - 1 );
+			if ( filename.find( EXTENSION_STR[ extention ], filename.size( ) - 5 ) == std::string::npos ) {
+				filename += EXTENSION_STR[ extention ];
+			}
+			if ( !Desk::getTask( )->load( filename ) ) {
+				MessageBox( NULL, "ファイルの読み込みに失敗しました", "エラー", MB_OK );
+			}
+		}
 	}
-
-	//ウィンドウの生成
-	_window_handle = CreateWindowEx(
-		WS_EX_ACCEPTFILES,
-		CLASS_NAME, TITLE_NAME,
-		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT, CW_USEDEFAULT,
-		SCREEN_WIDTH, SCREEN_HEIGHT,
-		NULL, NULL,
-		NULL, NULL
-	);
-
-	//ウィンドウのハンドルがNULLの場合はエラー
-	if ( !_window_handle ) {
-		return FALSE;
+		break;
+	case IDM_FILESAVE:
+	{
+		OPENFILENAME ofn = { };
+		//メモリ掃除
+		memset( &ofn, 0, sizeof( OPENFILENAME ) );
+		//サイズを指定
+		ofn.lStructSize = sizeof( OPENFILENAME ); 
+		//入出力拡張子を指定
+		ofn.lpstrFilter = "PNG Files (*.png)\0*.png\0JPEG Files (*.jpeg)\0*.jpeg\0JPG Files (*.jpg)\0*.jpg\0すべてのファイル (*.*)\0*.*\0";
+		//ディレクトリを指定、NULLでフルパス
+		ofn.lpstrFileTitle = NULL;
+		//初期表示のファイルタイプ( 1:png 2:jpeg 3:all )
+		ofn.nFilterIndex = 1;
+		//ファイル名格納用変数
+		char filename[ MAX_PATH ];
+		ZeroMemory( filename, MAX_PATH );
+		//ダイアログを所持するウィンドウハンドル
+		ofn.hwndOwner = GetMainWindowHandle( );
+		//ファイル名が格納される
+		ofn.lpstrFile = ( char* )filename; 
+		//ファイル名のバッファーサイズ
+		ofn.nMaxFile = MAX_PATH;
+		//拡張機能のフラグ
+		ofn.Flags = OFN_ENABLESIZING | OFN_OVERWRITEPROMPT;
+		//タイトルバーに表示される名前
+		ofn.lpstrTitle = "名前を付けて保存";
+		if ( GetSaveFileName( &ofn ) == TRUE ) {
+			//拡張子確認
+			EXTENSION extention = ( EXTENSION )( ofn.nFilterIndex - 1 );
+			std::string filename = ofn.lpstrFile;
+			if ( filename.find( EXTENSION_STR[ extention ] ) == std::string::npos ) {
+				filename += EXTENSION_STR[ extention ];
+			}
+			if ( !Desk::getTask( )->save( filename, extention ) ) {
+				MessageBox( NULL, "ファイルの保存失敗しました", "エラー", MB_OK );
+			}
+		}
+	}
+		break;
+	case IDM_NEWFILE:
+		//新規作成モードへ移行
+		Editor::getInstance( )->setMode( Editor::MODE_CREATE );
+		break;
+	case IDM_EXIT:
+		//終了処理
+		PostQuitMessage( 0 );
+		break;
 	}
 	return TRUE;
 }
 
-LRESULT CALLBACK Window::WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) {
-    switch( msg ) {
-	case WM_SIZE:
-		//ウィンドウサイズ変更した
-		break;
-	case WM_DESTROY:
-		//ウィンドウを閉じた
-		PostQuitMessage( 0 );
-        return 0L;
-	case WM_COMMAND:
-		//メニューバーのコマンドを選択した
-		std::shared_ptr< Editor >( Editor::getInstance( ) )->excuteCommand( hWnd, wParam );
-	}
-    return  DefWindowProc( hWnd, msg, wParam, lParam );
+void Window::update( ) {
+	GetWindowSize( &_width, &_height );
 }
 
 HWND Window::getWindowHandle( ) const {
-	return _window_handle;
+	return GetMainWindowHandle( );
+}
+
+int Window::getScreenWidth( ) const {
+	return _width;
+}
+
+int Window::getScreenHeight( ) const {
+	return _height;
 }

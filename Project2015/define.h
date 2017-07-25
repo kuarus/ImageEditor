@@ -1,5 +1,9 @@
 #pragma once
 
-const int SCREEN_WIDTH = 1920;
-const int SCREEN_HEIGHT = 1080;
-const int FONT_SIZE = 20;
+enum EXTENSION {
+	EXTENSION_PNG,
+	EXTENSION_JPEG,
+	ENTENSION_JPG,
+	EXTENSION_ALL,
+	MAX_EXTENSION,
+};

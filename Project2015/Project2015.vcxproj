@@ -158,7 +158,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Desk.cpp" />
+    <ClCompile Include="Creator.cpp" />
+    <ClCompile Include="CursorDesk.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="Interface.cpp" />
     <ClCompile Include="Keyboard.cpp" />
@@ -167,11 +168,12 @@
     <ClCompile Include="Task.cpp" />
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="WinMain.cpp" />
-    <ClCompile Include="Work.cpp" />
+    <ClCompile Include="Desk.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Creator.h" />
+    <ClInclude Include="CursorDesk.h" />
     <ClInclude Include="define.h" />
-    <ClInclude Include="Desk.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="Interface.h" />
     <ClInclude Include="Keyboard.h" />
@@ -180,7 +182,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="Task.h" />
     <ClInclude Include="Window.h" />
-    <ClInclude Include="Work.h" />
+    <ClInclude Include="Desk.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Menu.rc" />

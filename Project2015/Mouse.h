@@ -22,9 +22,10 @@ public:
 	virtual ~Mouse( );
 public:
 	void update( );
-	void getPos( int& x, int& y );
-	bool isPushButton( MOUSE button );
-	bool isHoldButton( MOUSE button );
+	void getPos( int& x, int& y ) const;
+	int getWheel( ) const;
+	bool isPushButton( MOUSE button ) const;
+	bool isHoldButton( MOUSE button ) const;
 private:
 	int _x;
 	int _y;

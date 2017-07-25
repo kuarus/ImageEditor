@@ -1,15 +1,21 @@
 #pragma once
 #include <Windows.h>
+#include "Task.h"
 
-class Window {
+class Window : public Task {
+public:
+	static std::shared_ptr< Window > getTask( );
+	static int MenuProc( WORD word );
 public:
 	Window( );
 	virtual ~Window( );
 public:
-	static LRESULT CALLBACK WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
-	int create( );
+	void update( );
+	int getScreenWidth( ) const;
+	int getScreenHeight( ) const;
 	HWND getWindowHandle( ) const;
 private:
-	HWND _window_handle;
+	int _width;
+	int _height;
 };
 

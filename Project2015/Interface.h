@@ -1,5 +1,7 @@
 #pragma once
-class Interface {
+#include "Task.h"
+
+class Interface : public Task {
 public:
 	Interface( );
 	virtual ~Interface( );
@@ -9,7 +11,5 @@ public:
 private:
 	void drawBG( ) const;
 	void drawLayerBox( ) const;
-private:
-	int _handle;
 };
 

@@ -3,39 +3,45 @@
 #include <memory>
 #include <array>
 
+class Task;
+class Desk;
 class Window;
 class Interface;
-class Desk;
-class Task;
 
 class Editor {
 public:
+	enum MODE {
+		MODE_EDIT,
+		MODE_CREATE,
+		MAX_MODE
+	};
 	enum TASK {
 		TASK_MOUSE,
 		TASK_KEYBOARD,
+		TASK_DESK,
+		TASK_WINDOW,
 		MAX_TASK
 	};
 public:
-	Editor( int nCmdShow );
+	Editor( );
 	virtual ~Editor( );
 public:
-	static void initialize( int nCmdShow );
+	static void initialize( );
 	static std::shared_ptr< Editor > getInstance( );
 public:
+	void setMode( MODE mode );
+	MODE getMode( ) const;
 	std::shared_ptr< Task > getTask( TASK task ) const;
 	void run( );
-	void excuteCommand( HWND hWnd, WPARAM wParam );
 private:
 	int isLoop( );
 	void flip( );
-	void updateTask( );
+	void update( );
 private:
 	static std::shared_ptr< Editor > _instance;
 private:
-	std::shared_ptr< Desk > _desk;
-	std::shared_ptr< Window > _window;
-	std::shared_ptr< Interface > _interface;
+	MODE _mode;
 	std::array< std::shared_ptr< Task >, MAX_TASK > _task;
-	OPENFILENAME _ofn;
+	std::shared_ptr< Interface > _interface;
 };
 

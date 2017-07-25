@@ -2,13 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="WinMain.cpp" />
-    <ClCompile Include="Desk.cpp">
-      <Filter>Edit</Filter>
-    </ClCompile>
     <ClCompile Include="Layer.cpp">
-      <Filter>Edit</Filter>
-    </ClCompile>
-    <ClCompile Include="Work.cpp">
       <Filter>Edit</Filter>
     </ClCompile>
     <ClCompile Include="Editor.cpp" />
@@ -27,18 +21,17 @@
     <ClCompile Include="Keyboard.cpp">
       <Filter>Task</Filter>
     </ClCompile>
+    <ClCompile Include="Desk.cpp">
+      <Filter>Edit</Filter>
+    </ClCompile>
+    <ClCompile Include="Creator.cpp" />
+    <ClCompile Include="CursorDesk.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
       <Filter>Menu</Filter>
     </ClInclude>
-    <ClInclude Include="Desk.h">
-      <Filter>Edit</Filter>
-    </ClInclude>
     <ClInclude Include="Layer.h">
-      <Filter>Edit</Filter>
-    </ClInclude>
-    <ClInclude Include="Work.h">
       <Filter>Edit</Filter>
     </ClInclude>
     <ClInclude Include="Editor.h" />
@@ -60,6 +53,11 @@
     <ClInclude Include="Keyboard.h">
       <Filter>Task</Filter>
     </ClInclude>
+    <ClInclude Include="Desk.h">
+      <Filter>Edit</Filter>
+    </ClInclude>
+    <ClInclude Include="Creator.h" />
+    <ClInclude Include="CursorDesk.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Menu">

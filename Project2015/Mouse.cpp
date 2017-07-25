@@ -60,15 +60,18 @@ void Mouse::update( ) {
 	}
 }
 
-void Mouse::getPos( int& x, int& y ) {
+void Mouse::getPos( int& x, int& y ) const {
 	x = _x;
 	y = _y;
 }
 
+int Mouse::getWheel( ) const {
+	return _wheel;
+}
 
-bool Mouse::isPushButton( MOUSE button ) {
+bool Mouse::isPushButton( MOUSE button ) const {
 	return ( _button[ button ] == 1 );
 }
-bool Mouse::isHoldButton( MOUSE button ) {
+bool Mouse::isHoldButton( MOUSE button ) const {
 	return ( _button[ button ] > 0 );
 }
