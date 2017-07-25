@@ -14,17 +14,21 @@ const int FONT_SIZE = 20;
 
 Editor::Editor( ) :
 _mode( MODE_EDIT ) {
+
 	//クラス初期化
+	_task[ TASK_WINDOW ]	= std::shared_ptr< Task >( new Window );
 	_task[ TASK_MOUSE ]		= std::shared_ptr< Task >( new Mouse );
 	_task[ TASK_KEYBOARD ]	= std::shared_ptr< Task >( new Keyboard );
 	_task[ TASK_DESK ]		= std::shared_ptr< Task >( new Desk );
-	_task[ TASK_WINDOW ]	= std::shared_ptr< Task >( new Window );
 
 
 	_interface = std::shared_ptr< Interface >( new Interface );
 
 	//描画場所を設定
 	SetDrawScreen( DX_SCREEN_BACK );
+
+	//拡縮方法変更
+	SetDrawMode( DX_DRAWMODE_NEAREST );
 
 	//文字サイズ設定
 	SetFontSize( FONT_SIZE );

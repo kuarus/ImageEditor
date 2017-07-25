@@ -22,7 +22,11 @@ std::shared_ptr< Window > Window::getTask( ) {
 
 
 Window::Window( ) {
+	//ウィンドウモード
 	ChangeWindowMode( TRUE );
+
+	//高速化
+	SetUseXInputFlag( FALSE );
 
 	//ウィンドウスタイルのセット
 	SetWindowStyleMode( 7 );
@@ -44,6 +48,9 @@ Window::Window( ) {
 
 	//ドラッグ&ドロップを許可する
 	SetDragFileValidFlag( TRUE );
+
+	//タイトルを設定
+	SetWindowText( TITLE_NAME );
 
 	//DxLib初期化(ここでwinodwが表示される)
 	if ( DxLib_Init( ) == -1 ) {

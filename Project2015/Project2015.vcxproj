@@ -159,7 +159,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Creator.cpp" />
-    <ClCompile Include="CursorDesk.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="Interface.cpp" />
     <ClCompile Include="Keyboard.cpp" />
@@ -172,7 +171,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Creator.h" />
-    <ClInclude Include="CursorDesk.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="Interface.h" />

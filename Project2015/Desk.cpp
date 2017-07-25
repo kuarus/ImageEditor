@@ -15,7 +15,7 @@ std::shared_ptr< Desk > Desk::getTask( ) {
 Desk::Desk( ) :
 _handle( -1 ),
 _zoom( 100 ) {
-	_trans_handle = LoadGraph( "Resource/trans.jpg" );
+	_trans_handle = LoadGraph( "Resource/trans.png" );
 }
 
 Desk::~Desk( ) {
@@ -25,10 +25,16 @@ void Desk::update( ) {
 	std::shared_ptr< Mouse > mouse = Mouse::getTask( );
 	int wheel = mouse->getWheel( );
 	if ( wheel > 0 ) {
-		_zoom += 5;
+		_zoom += 25;
 	}
 	if ( wheel < 0 ) {
-		_zoom -= 5;
+		_zoom -= 25;
+	}
+	if ( _zoom > MAX_ZOOM ) {
+		_zoom = MAX_ZOOM;
+	}
+	if ( _zoom < MIN_ZOOM ) {
+		_zoom = MIN_ZOOM;
 	}
 }
 
@@ -40,7 +46,7 @@ void Desk::draw( ) const {
 		int width = 0;
 		int height = 0;
 		GetGraphSize( _trans_handle, &width, &height );
-		DrawExtendGraph( 0, 0, ( int )( width * _zoom ), ( int )( height * _zoom ), _handle, TRUE );
+		DrawExtendGraph( 0, 0, width * 4 * _zoom / 100, width * 4 * _zoom / 100, _trans_handle, TRUE );
 	}
 	{//ƒŒƒCƒ„[‚ðˆê‚Â‚Ì‰æ‘œ‚É‘Î‚µ‚Ä•`‰æ
 		SetDrawScreen( _handle );
