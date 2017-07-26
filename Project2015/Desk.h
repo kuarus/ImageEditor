@@ -24,15 +24,30 @@ private:
 		TOOL_SELECT,
 		TOOL_MOVE,
 		TOOL_FILL,
+		TOOL_PAINT,
 		MAX_TOOL,
 	};
 private:
+	void convertScreenPosToLayerPos( int& x, int& y ) const;
+	void zoom( );
+	void paint( ) const;
+	void select( );
+	void drawSelect( ) const;
+	void fill( );
+	void fillAlgorithm( int x, int y, unsigned int base_color, int allow_value, int width, int height ) const;
+private:
+	int _select_start_x;
+	int _select_start_y;
+	int _select_end_x;
+	int _select_end_y;
 	TOOL _tool;
 	int _active_layer;
 	int _trans_handle;
 	int _handle;
+	int _si_handle;
 	unsigned int _color;
 	int _allow_value;
+	int _alpha;
 	int _zoom;//í èÌ:100
 	std::vector< std::shared_ptr< Layer > > _layer;
 };

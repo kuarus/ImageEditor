@@ -15,6 +15,8 @@ Mouse::~Mouse( ) {
 }
 
 void Mouse::update( ) {
+	_old_x = _x;
+	_old_y = _y;
 	GetMousePoint( &_x, &_y );
 	_wheel = GetMouseWheelRotVol( );
 	int input = GetMouseInput( );
@@ -58,11 +60,21 @@ void Mouse::update( ) {
 	} else {
 		_button[ MOUSE_BUTTON_8 ] = 0;
 	}
+	for ( int i = 0; i < MAX_MOUSE; i++ ) {
+		if ( _button[ i ] > 100 ) {
+			_button[ i ] = 100;
+		}
+	}
 }
 
 void Mouse::getPos( int& x, int& y ) const {
 	x = _x;
 	y = _y;
+}
+
+void Mouse::getOldPos( int& x, int& y ) const {
+	x = _old_x;
+	y = _old_y;
 }
 
 int Mouse::getWheel( ) const {
