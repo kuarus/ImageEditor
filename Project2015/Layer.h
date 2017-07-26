@@ -11,6 +11,8 @@ public:
 	void create( int width, int height );
 	int getHandle( ) const;
 	std::string getName( ) const;
+	void fill( int x, int y, unsigned int base_color, unsigned int paint_color, int allow_value );
+	int getColor( int x, int y ) const;
 private:
 	int _handle;
 	bool _eye;

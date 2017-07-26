@@ -20,9 +20,19 @@ public:
 	int getLayerSize( ) const;
 	std::shared_ptr< Layer > getLayer( int idx ) const;
 private:
+	enum TOOL {
+		TOOL_SELECT,
+		TOOL_MOVE,
+		TOOL_FILL,
+		MAX_TOOL,
+	};
+private:
+	TOOL _tool;
 	int _active_layer;
 	int _trans_handle;
 	int _handle;
+	unsigned int _color;
+	int _allow_value;
 	int _zoom;//í èÌ:100
 	std::vector< std::shared_ptr< Layer > > _layer;
 };

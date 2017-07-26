@@ -49,6 +49,9 @@ Window::Window( ) {
 	//ドラッグ&ドロップを許可する
 	SetDragFileValidFlag( TRUE );
 
+	//アクティブではないときは処理しない
+	SetAlwaysRunFlag( FALSE );
+
 	//タイトルを設定
 	SetWindowText( TITLE_NAME );
 

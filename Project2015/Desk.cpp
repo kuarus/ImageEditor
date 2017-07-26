@@ -4,6 +4,7 @@
 #include "Editor.h"
 #include <assert.h>
 #include "Mouse.h"
+#include "Keyboard.h"
 
 const int MAX_ZOOM = 500;
 const int MIN_ZOOM = 25;
@@ -14,7 +15,9 @@ std::shared_ptr< Desk > Desk::getTask( ) {
 
 Desk::Desk( ) :
 _handle( -1 ),
-_zoom( 100 ) {
+_zoom( 100 ),
+_allow_value( 10 ),
+_color( GetColor( 0, 0, 0 ) ) {
 	_trans_handle = LoadGraph( "Resource/trans.png" );
 }
 
@@ -23,6 +26,7 @@ Desk::~Desk( ) {
 
 void Desk::update( ) {
 	std::shared_ptr< Mouse > mouse = Mouse::getTask( );
+	std::shared_ptr< Keyboard > keyboard = Keyboard::getTask( );
 	int wheel = mouse->getWheel( );
 	if ( wheel > 0 ) {
 		_zoom += 25;
@@ -35,6 +39,37 @@ void Desk::update( ) {
 	}
 	if ( _zoom < MIN_ZOOM ) {
 		_zoom = MIN_ZOOM;
+	}
+	if ( keyboard->isPushKey( KEY_INPUT_G ) ) {
+		_tool = TOOL_FILL;
+	}
+	if ( keyboard->isPushKey( KEY_INPUT_V ) ) {
+		_tool = TOOL_MOVE;
+	}
+	if ( keyboard->isPushKey( KEY_INPUT_M ) ) {
+		_tool = TOOL_SELECT;
+	}
+
+	switch ( _tool ) {
+	case TOOL_SELECT:
+		break;
+	case TOOL_MOVE:
+		break;
+	case TOOL_FILL:
+		if ( ( int )_layer.size( ) >= _active_layer + 1 ) {
+			if ( mouse->isPushButton( Mouse::MOUSE_BUTTON_LEFT ) ) {
+				SetDrawScreen( _layer[ _active_layer ]->getHandle( ) );
+				int x = 0;
+				int y = 0;
+				mouse->getPos( x, y );
+				x = ( x * 100 ) / _zoom;
+				y = ( y * 100 ) / _zoom;
+				unsigned int color = _layer[ _active_layer ]->getColor( x, y );
+				_layer[ _active_layer ]->fill( x, y, color, _color, _allow_value );
+				SetDrawScreen( DX_SCREEN_BACK );
+			}
+		}
+		break;
 	}
 }
 
