@@ -32,6 +32,7 @@ private:
 	void zoom( );
 	void paint( ) const;
 	void select( );
+	void erase( );
 	void drawSelect( ) const;
 	void fill( );
 	void fillAlgorithm( int x, int y, unsigned int base_color, int allow_value, int width, int height ) const;

@@ -30,7 +30,6 @@ Desk::~Desk( ) {
 void Desk::update( ) {
 	std::shared_ptr< Mouse > mouse = Mouse::getTask( );
 	std::shared_ptr< Keyboard > keyboard = Keyboard::getTask( );
-	zoom( );
 	if ( keyboard->isPushKey( KEY_INPUT_P ) ) {
 		_tool = TOOL_PAINT;
 	}
@@ -44,7 +43,11 @@ void Desk::update( ) {
 		_tool = TOOL_SELECT;
 	}
 
+	zoom( );
 	if ( ( int )_layer.size( ) >= _active_layer + 1 ) {
+		if ( keyboard->isPushKey( KEY_INPUT_DELETE ) ) {
+			erase( );
+		}
 		switch ( _tool ) {
 		case TOOL_PAINT:
 			paint( );
@@ -55,9 +58,7 @@ void Desk::update( ) {
 		case TOOL_MOVE:
 			break;
 		case TOOL_FILL:
-			if ( mouse->isPushButton( Mouse::MOUSE_BUTTON_LEFT ) ) {
-				fill( );
-			}
+			fill( );
 			break;
 		}
 	}
@@ -110,19 +111,12 @@ bool Desk::load( std::string filename ) {
 	if ( ( int )_layer.size( ) == 0 ) {
 		make_mask = true;
 	}
-	if ( ( int )_layer.size( ) == _active_layer ) {
-		_layer.push_back( std::shared_ptr< Layer >( new Layer ) );
-	}
-
-	//ポインタがNULLの場合Layerを生成する。
-	if ( _layer[ _active_layer ] == std::shared_ptr< Layer >( ) ) {
-		_layer[ _active_layer ] = std::shared_ptr< Layer >( new Layer );
-	}
-
+	std::shared_ptr< Layer > layer = std::shared_ptr< Layer >( new Layer );
 	//load
-	if ( !_layer[ _active_layer ]->load( filename ) ) {
+	if ( !layer->load( filename ) ) {
 		return false;
 	}
+	_layer.push_back( layer );
 	if ( make_mask ) {
 		int handle = _layer[ _active_layer ]->getHandle( );
 		int width = 0;
@@ -276,6 +270,9 @@ void Desk::drawSelect( ) const {
 
 void Desk::fill( ) {
 	std::shared_ptr< Mouse > mouse = Mouse::getTask( );
+	if ( !mouse->isPushButton( Mouse::MOUSE_BUTTON_LEFT ) ) {
+		return;
+	}
 	//描画先をレイヤーに変更
 	SetDrawScreen( _layer[ _active_layer ]->getHandle( ) );
 	//CPU画像に変換するための画像を保存
@@ -458,4 +455,8 @@ void Desk::fillAlgorithm( int x, int y, unsigned int base_color, int allow_value
 			}
 		}
 	}
+}
+
+void Desk::erase( ) {
+
 }

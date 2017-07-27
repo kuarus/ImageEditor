@@ -60,12 +60,13 @@ Window::Window( ) {
 		return;
 	}
 
-	//ウィンドウの表示調整
+	//ウィンドウの表示位置・サイズ調整
 	MoveWindow(
 		GetMainWindowHandle( ),
-		( GetSystemMetrics( SM_CXSCREEN ) - WINDOW_MIN_WIDTH  ) / 2,
-		( GetSystemMetrics( SM_CYSCREEN ) - WINDOW_MIN_HEIGHT ) / 2,
-		WINDOW_MIN_WIDTH, WINDOW_MIN_HEIGHT,
+		GetSystemMetrics( SM_CXSCREEN ) / 6,
+		GetSystemMetrics( SM_CYSCREEN ) / 6,
+		GetSystemMetrics( SM_CXSCREEN ) / 3 * 2,
+		GetSystemMetrics( SM_CYSCREEN ) / 3 * 2,
 		TRUE
 	);
 }

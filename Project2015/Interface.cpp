@@ -75,8 +75,8 @@ void Interface::drawLayerBox( ) const {
 			std::shared_ptr< Layer > layer = desk->getLayer( i );
 			DrawBox( x1, y1, x2, y2, LAYER_COLOR, TRUE );
 			DrawString( x1 + 30, y1 + 4, layer->getName( ).c_str( ), FONT_COLOR );
-			y1 += LAYER_BOX_HEIGHT + LAYER_BLANK;
-			y2 = y1 + LAYER_BOX_HEIGHT;
+			y1 += LAYER_HEIGHT + LAYER_BLANK;
+			y2 = y1 + LAYER_HEIGHT;
 		}
 	}
 }
