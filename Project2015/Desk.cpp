@@ -9,6 +9,7 @@
 const int MAX_ZOOM = 500;
 const int MIN_ZOOM = 25;
 const unsigned int SELECT_COLOR = GetColor( 5, 5, 5 );
+const int MAX_FILL = 3000;
 
 std::shared_ptr< Desk > Desk::getTask( ) {
 	return std::dynamic_pointer_cast< Desk >( Editor::getInstance( )->getTask( Editor::TASK_DESK ) );
@@ -20,7 +21,9 @@ _zoom( 100 ),
 _allow_value( 10 ),
 _color( GetColor( 0, 0, 0 ) ),
 _alpha( 255 ),
-_tool( TOOL_PAINT ) {
+_tool( TOOL_PAINT ),
+_view_x( 0 ),
+_view_y( 0 ) {
 	_trans_handle = LoadGraph( "Resource/trans.png" );
 }
 
@@ -28,7 +31,60 @@ Desk::~Desk( ) {
 }
 
 void Desk::update( ) {
+	std::shared_ptr< Keyboard > keyboard = Keyboard::getTask( );
+
+	updateZoom( );
+	updateViewPos( );
+	if ( ( int )_layer.size( ) >= _active_layer + 1 ) {
+		updateTool( );
+		if ( keyboard->isPushKey( KEY_INPUT_DELETE ) ) {
+			erase( );
+		}
+	}
+}
+
+void Desk::updateViewPos( ) {
 	std::shared_ptr< Mouse > mouse = Mouse::getTask( );
+	if ( mouse->isHoldButton( Mouse::MOUSE_BUTTON_RIGHT ) ) {
+		int old_x = 0;
+		int old_y = 0;
+		mouse->getOldPos( old_x, old_y );
+		int now_x = 0;
+		int now_y = 0;
+		mouse->getPos( now_x, now_y );
+		int move_x = now_x - old_x;
+		int move_y = now_y - old_y;
+		_view_x += move_x;
+		_view_y += move_y;
+	}
+}
+
+void Desk::updateZoom( ) {
+	std::shared_ptr< Mouse > mouse = Mouse::getTask( );
+	int wheel = mouse->getWheel( );
+	int tmp_zoon = _zoom;
+	if ( wheel > 0 ) {
+		tmp_zoon += 25;
+	}
+	if ( wheel < 0 ) {
+		tmp_zoon -= 25;
+	}
+	if ( tmp_zoon > MAX_ZOOM ) {
+		tmp_zoon = MAX_ZOOM;
+	}
+	if ( tmp_zoon < MIN_ZOOM ) {
+		tmp_zoon = MIN_ZOOM;
+	}
+	if ( tmp_zoon != _zoom ) {
+		_select_start_x = ( _select_start_x * tmp_zoon ) / _zoom;
+		_select_start_y = ( _select_start_y * tmp_zoon ) / _zoom;
+		_select_end_x = ( _select_end_x * tmp_zoon ) / _zoom;
+		_select_end_y = ( _select_end_y * tmp_zoon ) / _zoom;
+		_zoom = tmp_zoon;
+	}
+}
+
+void Desk::updateTool( ) {
 	std::shared_ptr< Keyboard > keyboard = Keyboard::getTask( );
 	if ( keyboard->isPushKey( KEY_INPUT_P ) ) {
 		_tool = TOOL_PAINT;
@@ -43,26 +99,21 @@ void Desk::update( ) {
 		_tool = TOOL_SELECT;
 	}
 
-	zoom( );
-	if ( ( int )_layer.size( ) >= _active_layer + 1 ) {
-		if ( keyboard->isPushKey( KEY_INPUT_DELETE ) ) {
-			erase( );
-		}
-		switch ( _tool ) {
-		case TOOL_PAINT:
-			paint( );
-			break;
-		case TOOL_SELECT:
-			select( );
-			break;
-		case TOOL_MOVE:
-			break;
-		case TOOL_FILL:
-			fill( );
-			break;
-		}
+	switch ( _tool ) {
+	case TOOL_PAINT:
+		paint( );
+		break;
+	case TOOL_SELECT:
+		select( );
+		break;
+	case TOOL_MOVE:
+		break;
+	case TOOL_FILL:
+		fill( );
+		break;
 	}
 }
+
 
 void Desk::draw( ) const {
 	if ( _handle <= 0 ) {
@@ -87,7 +138,7 @@ void Desk::draw( ) const {
 		int width = 0;
 		int height = 0;
 		GetGraphSize( _handle, &width, &height );
-		DrawExtendGraph( 0, 0, ( width * _zoom ) / 100, ( height * _zoom ) / 100, _handle, TRUE );
+		DrawExtendGraph( _view_x, _view_y, ( width * _zoom ) / 100 + _view_x, ( height * _zoom ) / 100 + _view_y, _handle, TRUE );
 	}
 	drawSelect( );
 }
@@ -174,34 +225,10 @@ std::shared_ptr< Layer > Desk::getLayer( int idx ) const {
 }
 
 void Desk::convertScreenPosToLayerPos( int& x, int& y ) const {
+	x -= _view_x;
+	y -= _view_y;
 	x = ( x * 100 ) / _zoom;
 	y = ( y * 100 ) / _zoom;
-}
-
-
-void Desk::zoom( ) {
-	std::shared_ptr< Mouse > mouse = Mouse::getTask( );
-	int wheel = mouse->getWheel( );
-	int tmp_zoon = _zoom;
-	if ( wheel > 0 ) {
-		tmp_zoon += 25;
-	}
-	if ( wheel < 0 ) {
-		tmp_zoon -= 25;
-	}
-	if ( tmp_zoon > MAX_ZOOM ) {
-		tmp_zoon = MAX_ZOOM;
-	}
-	if ( tmp_zoon < MIN_ZOOM ) {
-		tmp_zoon = MIN_ZOOM;
-	}
-	if ( tmp_zoon != _zoom ) {
-		_select_start_x = ( _select_start_x * tmp_zoon ) / _zoom;
-		_select_start_y = ( _select_start_y * tmp_zoon ) / _zoom;
-		_select_end_x = ( _select_end_x * tmp_zoon ) / _zoom;
-		_select_end_y = ( _select_end_y * tmp_zoon ) / _zoom;
-		_zoom = tmp_zoon;
-	}
 }
 
 void Desk::paint( ) const {
@@ -289,33 +316,24 @@ void Desk::fill( ) {
 
 	//ドット単位でアクセスできる画像を製作(CPU用画像)
 	_si_handle = LoadSoftImage( "work.png" );
-	//色を取得(ベースカラーになる)
+
+
+	//初期カラー取得
 	int br = 0;
 	int bg = 0;
 	int bb = 0;
-	int ba = 0;
-	GetPixelSoftImage( _si_handle, x, y, &br, &bg, &bb, &ba );
-	int base_color = GetColor( br, bg, bb );
+	int tmp = 0;
+	GetPixelSoftImage_Unsafe_ARGB8( _si_handle, x, y, &br, &bg, &bb, &tmp );
 
-	//色の許容値修正
-	int allow_value = _allow_value;
+	//ペイントカラー取得
 	int pr = 0;
 	int pg = 0;
 	int pb = 0;
 	GetColor2( _color, &pr, &pg, &pb );
 
-	//if ( abs( br - pr ) < allow_value ) {
-	//	allow_value = abs( br - pr );
-	//}
-	//if ( abs( bg - pg ) < allow_value ) {
-	//	allow_value = abs( bg - pg );
-	//}
-	//if ( abs( bb - pb ) < allow_value ) {
-	//	allow_value = abs( bb - pb );
-	//}
-
 	//塗りつぶし
-	fillAlgorithm( x, y, base_color, allow_value, width, height );
+	fillAlgorithm( x, y, width, height, pr, pg, pb, br, bg, bb );
+
 
 	//CPU用画像をもとの画像へ変換
 	//ClearDrawScreen( );
@@ -325,29 +343,45 @@ void Desk::fill( ) {
 	_si_handle = -1;
 }
 
-void Desk::fillAlgorithm( int x, int y, unsigned int base_color, int allow_value, int width, int height ) const {
-	//描画カラー
-	int pr = 0;
-	int pg = 0;
-	int pb = 0;
-	GetColor2( _color, &pr, &pg, &pb );
+void Desk::fillAlgorithm( const int& x, const int& y, const int& width, const int& height, const int& pr, const int& pg, const int& pb, const int& br, const int& bg, const int& bb ) const {
 	//点を描画
-	if ( DrawPixelSoftImage( _si_handle, x, y, pr, pg, pb, _alpha ) == -1 ) {
-		return;
+	DrawPixelSoftImage( _si_handle, x, y, pr, pg, pb, _alpha );
+	//チェック座標
+	int cx = 0;
+	int cy = 0;
+	
+	//上
+	cx = x;
+	cy = y - 1;
+	if ( isAllowedFill( cx, cy, width, height, pr, pg, pb, br, bg, bb ) ) {
+		fillAlgorithm0( cx, cy, width, height, pr, pg, pb, br, bg, bb );
+	}
+	//下
+	cx = x;
+	cy = y + 1;
+	if ( isAllowedFill( cx, cy, width, height, pr, pg, pb, br, bg, bb ) ) {
+		fillAlgorithm1( cx, cy, width, height, pr, pg, pb, br, bg, bb );
 	}
 
-	//ベースカラー
-	int br = 0;
-	int bg = 0;
-	int bb = 0;
-	GetColor2( base_color, &br, &bg, &bb );
+	//左
+	cx = x - 1;
+	cy = y;
+	if ( isAllowedFill( cx, cy, width, height, pr, pg, pb, br, bg, bb ) ) {
+		fillAlgorithm2( cx, cy, width, height, pr, pg, pb, br, bg, bb );
+	}
 
-	//取得カラー
-	int gr = 0;
-	int gg = 0;
-	int gb = 0;
-	int ga = 0;
 
+	//右
+	cx = x + 1;
+	cy = y;
+	if ( isAllowedFill( cx, cy, width, height, pr, pg, pb, br, bg, bb ) ) {
+		fillAlgorithm3( cx, cy, width, height, pr, pg, pb, br, bg, bb );
+	}
+}
+
+void Desk::fillAlgorithm0( const int& x, const int& y, const int& width, const int& height, const int& pr, const int& pg, const int& pb, const int& br, const int& bg, const int& bb ) const {
+	//点を描画
+	DrawPixelSoftImage_Unsafe_ARGB8( _si_handle, x, y, pr, pg, pb, _alpha );
 	//チェック座標
 	int cx = 0;
 	int cy = 0;
@@ -355,106 +389,133 @@ void Desk::fillAlgorithm( int x, int y, unsigned int base_color, int allow_value
 	//上
 	cx = x;
 	cy = y - 1;
-	if ( cx >= 0 && cx <= width && cy >= 0 && cy <= height) {
-		//ベースカラーと取得カラーの差を調べる
-		GetPixelSoftImage( _si_handle, cx, cy, &gr, &gg, &gb, &ga );
-		if ( pr != gr ||
-			 pg != gg ||
-			 pb != gb ) {
-			if ( abs( br - gr ) < allow_value &&
-				 abs( bg - gg ) < allow_value &&
-				 abs( bb - gb ) < allow_value ) {
-				//cx, cyから塗りつぶしスタート
-				fillAlgorithm( cx, cy, base_color, allow_value, width, height );
-			}
-		}
-		if ( pr == gr &&
-			 pg == gg &&
-			 pb == gb ) {
-			if ( ga < _alpha ) {
-				//透明度変更
-				//fillAlgorithm( cx, cy, base_color, allow_value, width, height );
-			}
-		}
-	}
-
-	//下
-	cx = x;
-	cy = y + 1;
-	if ( cx >= 0 && cx <= width && cy >= 0 && cy <= height) {
-		//ベースカラーと取得カラーの差を調べる
-		GetPixelSoftImage( _si_handle, cx, cy, &gr, &gg, &gb, &ga );
-		if ( pr != gr ||
-			 pg != gg ||
-			 pb != gb ) {
-			if ( abs( br - gr ) < allow_value &&
-				 abs( bg - gg ) < allow_value &&
-				 abs( bb - gb ) < allow_value ) {
-				//cx, cyから塗りつぶしスタート
-				fillAlgorithm( cx, cy, base_color, allow_value, width, height );
-			}
-		}
-		if ( pr == gr &&
-			 pg == gg &&
-			 pb == gb ) {
-			if ( ga < _alpha ) {
-				//透明度変更
-				//fillAlgorithm( cx, cy, base_color, allow_value, width, height );
-			}
-		}
+	if ( isAllowedFill( cx, cy, width, height, pr, pg, pb, br, bg, bb ) ) {
+		fillAlgorithm0( cx, cy, width, height, pr, pg, pb, br, bg, bb );
 	}
 
 	//左
 	cx = x - 1;
-	cy = y;	
-	if ( cx >= 0 && cx <= width && cy >= 0 && cy <= height) {
-		//ベースカラーと取得カラーの差を調べる
-		GetPixelSoftImage( _si_handle, cx, cy, &gr, &gg, &gb, &ga );
-		if ( pr != gr ||
-			 pg != gg ||
-			 pb != gb ) {
-			if ( abs( br - gr ) < allow_value &&
-				 abs( bg - gg ) < allow_value &&
-				 abs( bb - gb ) < allow_value ) {
-				//cx, cyから塗りつぶしスタート
-				fillAlgorithm( cx, cy, base_color, allow_value, width, height );
-			}
-		}
-		if ( pr == gr &&
-			 pg == gg &&
-			 pb == gb ) {
-			if ( ga < _alpha ) {
-				//透明度変更
-				//fillAlgorithm( cx, cy, base_color, allow_value, width, height );
-			}
-		}
+	cy = y;
+	if ( isAllowedFill( cx, cy, width, height, pr, pg, pb, br, bg, bb ) ) {
+		fillAlgorithm2( cx, cy, width, height, pr, pg, pb, br, bg, bb );
+	}
+
+
+	//右
+	cx = x + 1;
+	cy = y;
+	if ( isAllowedFill( cx, cy, width, height, pr, pg, pb, br, bg, bb ) ) {
+		fillAlgorithm3( cx, cy, width, height, pr, pg, pb, br, bg, bb );
+	}
+}
+
+void Desk::fillAlgorithm1( const int& x, const int& y, const int& width, const int& height, const int& pr, const int& pg, const int& pb, const int& br, const int& bg, const int& bb ) const {
+	//点を描画
+	DrawPixelSoftImage_Unsafe_ARGB8( _si_handle, x, y, pr, pg, pb, _alpha );
+	//チェック座標
+	int cx = 0;
+	int cy = 0;
+
+	//下
+	cx = x;
+	cy = y + 1;
+	if ( isAllowedFill( cx, cy, width, height, pr, pg, pb, br, bg, bb ) ) {
+		fillAlgorithm1( cx, cy, width, height, pr, pg, pb, br, bg, bb );
+	}
+
+	//左
+	cx = x - 1;
+	cy = y;
+	if ( isAllowedFill( cx, cy, width, height, pr, pg, pb, br, bg, bb ) ) {
+		fillAlgorithm2( cx, cy, width, height, pr, pg, pb, br, bg, bb );
+	}
+
+
+	//右
+	cx = x + 1;
+	cy = y;
+	if ( isAllowedFill( cx, cy, width, height, pr, pg, pb, br, bg, bb ) ) {
+		fillAlgorithm3( cx, cy, width, height, pr, pg, pb, br, bg, bb );
+	}
+}
+
+void Desk::fillAlgorithm2( const int& x, const int& y, const int& width, const int& height, const int& pr, const int& pg, const int& pb, const int& br, const int& bg, const int& bb ) const {
+	//点を描画
+	DrawPixelSoftImage_Unsafe_ARGB8( _si_handle, x, y, pr, pg, pb, _alpha );
+	//チェック座標
+	int cx = 0;
+	int cy = 0;
+
+	//上
+	cx = x;
+	cy = y - 1;
+	if ( isAllowedFill( cx, cy, width, height, pr, pg, pb, br, bg, bb ) ) {
+		fillAlgorithm0( cx, cy, width, height, pr, pg, pb, br, bg, bb );
+	}
+	//下
+	cx = x;
+	cy = y + 1;
+	if ( isAllowedFill( cx, cy, width, height, pr, pg, pb, br, bg, bb ) ) {
+		fillAlgorithm1( cx, cy, width, height, pr, pg, pb, br, bg, bb );
+	}
+
+	//左
+	cx = x - 1;
+	cy = y;
+	if ( isAllowedFill( cx, cy, width, height, pr, pg, pb, br, bg, bb ) ) {
+		fillAlgorithm2( cx, cy, width, height, pr, pg, pb, br, bg, bb );
+	}
+}
+
+void Desk::fillAlgorithm3( const int& x, const int& y, const int& width, const int& height, const int& pr, const int& pg, const int& pb, const int& br, const int& bg, const int& bb ) const {
+	//点を描画
+	DrawPixelSoftImage_Unsafe_ARGB8( _si_handle, x, y, pr, pg, pb, _alpha );
+	//チェック座標
+	int cx = 0;
+	int cy = 0;
+
+	//上
+	cx = x;
+	cy = y - 1;
+	if ( isAllowedFill( cx, cy, width, height, pr, pg, pb, br, bg, bb ) ) {
+		fillAlgorithm0( cx, cy, width, height, pr, pg, pb, br, bg, bb );
+	}
+	//下
+	cx = x;
+	cy = y + 1;
+	if ( isAllowedFill( cx, cy, width, height, pr, pg, pb, br, bg, bb ) ) {
+		fillAlgorithm1( cx, cy, width, height, pr, pg, pb, br, bg, bb );
 	}
 
 	//右
 	cx = x + 1;
 	cy = y;
-	if ( cx >= 0 && cx <= width && cy >= 0 && cy <= height) {
+	if ( isAllowedFill( cx, cy, width, height, pr, pg, pb, br, bg, bb ) ) {
+		fillAlgorithm3( cx, cy, width, height, pr, pg, pb, br, bg, bb );
+	}
+}
+
+bool Desk::isAllowedFill( const int& x, const int& y, const int& width, const int& height, const int& pr, const int& pg, const int& pb, const int& br, const int& bg, const int& bb ) const {
+	bool result = false;
+	if ( x >= 0 && x < width && y >= 0 && y < height ) {
 		//ベースカラーと取得カラーの差を調べる
-		GetPixelSoftImage( _si_handle, cx, cy, &gr, &gg, &gb, &ga );
-		if ( pr != gr ||
-			 pg != gg ||
-			 pb != gb ) {
-			if ( abs( br - gr ) < allow_value &&
-				 abs( bg - gg ) < allow_value &&
-				 abs( bb - gb ) < allow_value ) {
-				//cx, cyから塗りつぶしスタート
-				fillAlgorithm( cx, cy, base_color, allow_value, width, height );
-			}
-		}
-		if ( pr == gr &&
-			 pg == gg &&
-			 pb == gb ) {
-			if ( ga < _alpha ) {
-				//透明度変更
-				//fillAlgorithm( cx, cy, base_color, allow_value, width, height );
+		int gr = 0;
+		int gg = 0;
+		int gb = 0;
+		int ga = 0;
+		GetPixelSoftImage_Unsafe_ARGB8( _si_handle, x, y, &gr, &gg, &gb, &ga );
+		if ( pr		!= gr ||
+			 pg		!= gg ||
+			 pb		!= gb ||
+			 _alpha != ga ) {
+			if ( abs( br - gr ) < _allow_value &&
+				 abs( bg - gg ) < _allow_value &&
+				 abs( bb - gb ) < _allow_value ) {
+				result = true;
 			}
 		}
 	}
+	return result;
 }
 
 void Desk::erase( ) {
